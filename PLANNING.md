@@ -335,7 +335,7 @@ Onboarding → Dashboard → [Calendario | Grupos | Memories | Social]
 2. **Invite-only al inicio** — exclusividad
 3. **Influencers de productividad y lifestyle**
 4. **Contenido orgánico:** templates, tips, aesthetic setups
-5. **Referral system:** invita 3 amigos = premium 1 mes
+5. **Referral system:** invita 3 amigos = 1 mes de "Expandí tu Nido ✨"
 
 ### Crecimiento Orgánico
 - Los calendarios compartidos son inherentemente virales
@@ -347,25 +347,35 @@ Onboarding → Dashboard → [Calendario | Grupos | Memories | Social]
 
 ## Ideas de Monetización
 
-### Freemium Model
+### Filosofía: "Expandí tu Nido ✨"
 
-| Feature | Free | Premium ($4.99/mes) |
-|---------|------|---------------------|
+La versión gratuita debe sentirse **completa, cómoda y usable**. Sin anuncios para nadie — los ads rompen la esencia cálida e íntima de Nido. El premium no bloquea funciones básicas: se siente como "quiero expandir mi experiencia", no como "me están limitando". La gente paga porque ama la experiencia, no porque la app los frena.
+
+### Modelo Freemium
+
+| Feature | Free | Expandí tu Nido ✨ ($4.99/mes) |
+|---------|------|-------------------------------|
 | Calendarios personales | ✅ | ✅ |
-| Calendarios compartidos | 2 | Ilimitados |
-| Grupos | 3 | Ilimitados |
-| Memories storage | 1 GB | 50 GB |
-| Watch party | 4 personas | 20 personas |
-| Temas custom | 3 | Todos |
-| Widgets avanzados | ❌ | ✅ |
-| Estadísticas detalladas | ❌ | ✅ |
-| Sin ads | ❌ | ✅ |
-| Cápsulas de tiempo | 1/mes | Ilimitadas |
+| Calendarios compartidos | 4 | Ilimitados |
+| Grupos | 4 | Ilimitados |
+| Sin anuncios | ✅ | ✅ |
+| Memories storage | 2 GB | 50 GB |
+| Watch party / rooms | 4 personas | 20 personas |
+| Themes aesthetic | 3 básicos | Colección completa + exclusivos |
+| Widgets avanzados | Básicos (Pomodoro, hábitos) | Todos (mood tracker, stats, music) |
+| Estadísticas de productividad | Resumen semanal | Detalladas + historial + insights |
+| Cápsulas de tiempo | 2/mes | Ilimitadas |
+| IA y personalización | ❌ | ✅ (sugerencias, recap, smart scheduling) |
+
+### Por qué este modelo funciona
+- **No frena el crecimiento:** 4 grupos y 4 calendarios compartidos gratis = la gente invita amigos sin toparse con un paywall. Lo viral de Nido es que cada grupo nuevo trae más usuarios.
+- **Sin ads para todos:** La app se siente como "tu espacio", no como una red social corporativa. Protege la identidad cálida y aesthetic.
+- **Premium aspiracional:** El usuario quiere más porque ama la experiencia, no porque le faltan cosas básicas. "Expandí tu Nido" suena a crecimiento personal, no a desbloquear features.
 
 ### Revenue Streams Adicionales
-- **Nido Teams** ($9.99/mes) — para empresas/universidades
-- **Temas y stickers** — marketplace aesthetic
-- **API para integraciones** — Spotify, Netflix, etc.
+- **Nido Teams** ($9.99/mes) — para empresas/universidades con admin panel, analytics y roles avanzados
+- **Marketplace de themes** — packs aesthetic creados por la comunidad (Nido se queda con comisión)
+- **API para integraciones** — Spotify, Netflix, Google Calendar, etc.
 
 ---
 

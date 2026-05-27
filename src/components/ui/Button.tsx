@@ -1,177 +1,56 @@
-import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { borderRadius, spacing } from '../../theme/spacing';
+"use client";
+
+import { motion } from "framer-motion";
+import { clsx } from "clsx";
 
 interface ButtonProps {
-  title: string;
-  onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  loading?: boolean;
+  children: React.ReactNode;
+  variant?: "primary" | "accent" | "ghost" | "outline";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+  onClick?: () => void;
   disabled?: boolean;
   icon?: React.ReactNode;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-  fullWidth?: boolean;
 }
+
+const variants = {
+  primary: "bg-chambray text-white hover:bg-chambray-dark",
+  accent: "bg-terracotta text-white hover:bg-terracotta-dark",
+  ghost: "bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-hover)]",
+  outline: "border border-[var(--border-color)] text-[var(--foreground)] hover:bg-[var(--surface-hover)]",
+};
+
+const sizes = {
+  sm: "px-3 py-1.5 text-xs",
+  md: "px-4 py-2 text-sm",
+  lg: "px-6 py-3 text-base",
+};
 
 export function Button({
-  title,
-  onPress,
-  variant = 'primary',
-  size = 'md',
-  loading = false,
-  disabled = false,
+  children,
+  variant = "primary",
+  size = "md",
+  className,
+  onClick,
+  disabled,
   icon,
-  style,
-  textStyle,
-  fullWidth = false,
 }: ButtonProps) {
-  const isDisabled = disabled || loading;
-
-  const sizeStyles = {
-    sm: { paddingVertical: spacing.sm, paddingHorizontal: spacing.base },
-    md: { paddingVertical: spacing.md, paddingHorizontal: spacing.lg },
-    lg: { paddingVertical: spacing.base, paddingHorizontal: spacing.xl },
-  };
-
-  const textSizes = {
-    sm: { fontSize: 13 },
-    md: { fontSize: 15 },
-    lg: { fontSize: 17 },
-  };
-
-  if (variant === 'primary') {
-    return (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={isDisabled}
-        activeOpacity={0.8}
-        style={[fullWidth && styles.fullWidth, style]}
-      >
-        <LinearGradient
-          colors={[colors.primary, colors.primaryLight]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={[
-            styles.base,
-            sizeStyles[size],
-            isDisabled && styles.disabled,
-            fullWidth && styles.fullWidth,
-          ]}
-        >
-          {loading ? (
-            <ActivityIndicator color={colors.textInverse} size="small" />
-          ) : (
-            <>
-              {icon}
-              <Text
-                style={[
-                  styles.text,
-                  styles.primaryText,
-                  textSizes[size],
-                  textStyle,
-                ]}
-              >
-                {title}
-              </Text>
-            </>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-    );
-  }
-
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={isDisabled}
-      activeOpacity={0.7}
-      style={[
-        styles.base,
-        sizeStyles[size],
-        variant === 'secondary' && styles.secondary,
-        variant === 'outline' && styles.outline,
-        variant === 'ghost' && styles.ghost,
-        isDisabled && styles.disabled,
-        fullWidth && styles.fullWidth,
-        style,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator
-          color={variant === 'outline' ? colors.primary : colors.textInverse}
-          size="small"
-        />
-      ) : (
-        <>
-          {icon}
-          <Text
-            style={[
-              styles.text,
-              textSizes[size],
-              variant === 'secondary' && styles.secondaryText,
-              variant === 'outline' && styles.outlineText,
-              variant === 'ghost' && styles.ghostText,
-              textStyle,
-            ]}
-          >
-            {title}
-          </Text>
-        </>
+    <motion.button
+      className={clsx(
+        "rounded-xl font-medium flex items-center gap-2 transition-colors",
+        variants[variant],
+        sizes[size],
+        disabled && "opacity-50 cursor-not-allowed",
+        className
       )}
-    </TouchableOpacity>
+      whileHover={!disabled ? { scale: 1.02 } : undefined}
+      whileTap={!disabled ? { scale: 0.98 } : undefined}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {icon}
+      {children}
+    </motion.button>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: borderRadius.lg,
-    gap: spacing.sm,
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  secondary: {
-    backgroundColor: colors.secondary,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  text: {
-    ...typography.button,
-  },
-  primaryText: {
-    color: colors.textInverse,
-  },
-  secondaryText: {
-    color: colors.textInverse,
-  },
-  outlineText: {
-    color: colors.primary,
-  },
-  ghostText: {
-    color: colors.primary,
-  },
-});

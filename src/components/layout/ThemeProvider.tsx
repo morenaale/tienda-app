@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useCallback, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useCallback, useState, useRef } from "react";
 
 type Theme = "light" | "dark" | "system";
 
@@ -22,13 +22,15 @@ function getStoredTheme(): Theme {
   return (localStorage.getItem("nido-theme") as Theme) || "system";
 }
 
+function resolveTheme(t: Theme): "light" | "dark" {
+  if (t === "system") return getSystemTheme();
+  return t;
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() => {
-    const initial = getStoredTheme();
-    if (initial === "system") return getSystemTheme();
-    return initial;
-  });
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() => resolveTheme(getStoredTheme()));
+  const mountedRef = useRef(false);
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
@@ -45,13 +47,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Apply theme on mount
     const root = document.documentElement;
     if (theme === "system") {
       root.removeAttribute("data-theme");
     } else {
       root.setAttribute("data-theme", theme);
     }
+    mountedRef.current = true;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

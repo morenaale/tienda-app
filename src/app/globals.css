@@ -109,13 +109,13 @@ body {
 }
 
 /* Smooth card shadows */
-.card-shadow {
+@utility card-shadow {
   box-shadow:
     0 1px 3px var(--shadow-color),
     0 4px 12px var(--shadow-color);
 }
 
-.card-shadow-hover {
+@utility card-shadow-hover {
   box-shadow:
     0 2px 8px var(--shadow-color),
     0 8px 24px var(--shadow-color);

@@ -132,7 +132,7 @@ export default function CalendarPage() {
             ))}
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
-              const isToday = day === today && month === new Date().getMonth();
+              const isToday = day === today && month === new Date().getMonth() && year === new Date().getFullYear();
               const isSelected = day === selectedDay;
               const hasEvents = sampleEvents.some((e) => e.day === day);
 

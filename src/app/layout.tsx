@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
@@ -13,10 +13,28 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#7A9CB3",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Nido — Organiza tu vida, comparte tus planes",
   description:
     "Tu espacio para organizar, compartir y conectar. Calendarios, grupos, recuerdos y productividad en una sola plataforma.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Nido",
+  },
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
+  },
 };
 
 export default function RootLayout({
@@ -25,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="es" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
       <body>
         <AppShell>{children}</AppShell>
       </body>

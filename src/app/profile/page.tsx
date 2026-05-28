@@ -16,6 +16,7 @@ import {
   MapPin,
   Link as LinkIcon,
 } from "lucide-react";
+import { toast } from "@/components/ui/Toast";
 
 const container = {
   hidden: { opacity: 0 },
@@ -104,7 +105,7 @@ export default function ProfilePage() {
 
             {/* Actions */}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" icon={<Settings size={14} />}>
+              <Button variant="outline" size="sm" icon={<Settings size={14} />} onClick={() => toast("Editar perfil \u2014 pr\u00f3ximamente")}>
                 Editar
               </Button>
             </div>
@@ -164,7 +165,7 @@ export default function ProfilePage() {
               <h2 className="font-serif text-lg font-semibold text-[var(--foreground)]">
                 Amigos
               </h2>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => toast("Lista completa de amigos \u2014 pr\u00f3ximamente")}>
                 Ver todos
               </Button>
             </div>
@@ -196,7 +197,7 @@ export default function ProfilePage() {
                       {friend.mutual} amigos en común
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => toast(`Perfil de ${friend.name}`)}>
                     <Heart size={14} />
                   </Button>
                 </div>

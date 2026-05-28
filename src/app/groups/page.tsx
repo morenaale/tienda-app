@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +13,7 @@ import {
   Phone,
   MoreHorizontal,
 } from "lucide-react";
+import { toast } from "@/components/ui/Toast";
 
 const container = {
   hidden: { opacity: 0 },
@@ -32,7 +34,7 @@ const groups = [
     lastMessage: "María: ¿Quién viene el sábado?",
     unread: 3,
     gradient: "from-chambray to-chambray-dark",
-    avatar: "🌊",
+    avatar: "wave",
   },
   {
     id: 2,
@@ -42,7 +44,7 @@ const groups = [
     lastMessage: "Lucas: Subí los apuntes al drive",
     unread: 7,
     gradient: "from-terracotta to-terracotta-dark",
-    avatar: "📚",
+    avatar: "books",
   },
   {
     id: 3,
@@ -52,7 +54,7 @@ const groups = [
     lastMessage: "Sofía: La presentación está lista",
     unread: 0,
     gradient: "from-chambray-light to-chambray",
-    avatar: "💼",
+    avatar: "briefcase",
   },
   {
     id: 4,
@@ -62,7 +64,7 @@ const groups = [
     lastMessage: "Martín: Encontré vuelos baratos!",
     unread: 12,
     gradient: "from-terracotta-light to-terracotta",
-    avatar: "✈️",
+    avatar: "plane",
   },
   {
     id: 5,
@@ -72,17 +74,42 @@ const groups = [
     lastMessage: "Ana: Sesión de estudio mañana?",
     unread: 2,
     gradient: "from-chambray-dark to-chambray",
-    avatar: "🎯",
+    avatar: "target",
   },
 ];
 
-const plans = [
-  { title: "Cine este viernes", group: "Amigos de siempre", votes: 5, total: 8 },
-  { title: "Sesión de estudio - Álgebra", group: "Study Group", votes: 4, total: 5 },
-  { title: "Asado de fin de cursada", group: "Facultad", votes: 10, total: 15 },
+const initialPlans = [
+  { title: "Cine este viernes", group: "Amigos de siempre", votes: 5, total: 8, voted: false },
+  { title: "Sesión de estudio - Álgebra", group: "Study Group", votes: 4, total: 5, voted: false },
+  { title: "Asado de fin de cursada", group: "Facultad", votes: 10, total: 15, voted: false },
 ];
 
+const avatarMap: Record<string, string> = {
+  wave: "🌊",
+  books: "📚",
+  briefcase: "💼",
+  plane: "✈️",
+  target: "🎯",
+};
+
 export default function GroupsPage() {
+  const [plans, setPlans] = useState(initialPlans);
+
+  const votePlan = (index: number, attending: boolean) => {
+    setPlans((prev) =>
+      prev.map((p, i) => {
+        if (i !== index) return p;
+        if (p.voted) return p;
+        return {
+          ...p,
+          voted: true,
+          votes: attending ? p.votes + 1 : p.votes,
+        };
+      })
+    );
+    toast(attending ? "Te apuntaste al plan!" : "Marcaste que no podés");
+  };
+
   return (
     <motion.div
       variants={container}
@@ -100,7 +127,7 @@ export default function GroupsPage() {
             {groups.length} grupos activos
           </p>
         </div>
-        <Button variant="accent" icon={<Plus size={16} />}>
+        <Button variant="accent" icon={<Plus size={16} />} onClick={() => toast("Crear grupo — próximamente")}>
           Nuevo grupo
         </Button>
       </motion.div>
@@ -111,7 +138,7 @@ export default function GroupsPage() {
           Planes pendientes
         </h2>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-          {plans.map((plan) => (
+          {plans.map((plan, index) => (
             <Card key={plan.title} className="min-w-[250px] flex-shrink-0">
               <p className="text-sm font-medium text-[var(--foreground)]">
                 {plan.title}
@@ -133,12 +160,18 @@ export default function GroupsPage() {
                 </span>
               </div>
               <div className="flex gap-2 mt-3">
-                <Button variant="primary" size="sm">
-                  Me apunto
-                </Button>
-                <Button variant="ghost" size="sm">
-                  No puedo
-                </Button>
+                {plan.voted ? (
+                  <span className="text-xs text-chambray font-medium py-1.5">Ya votaste</span>
+                ) : (
+                  <>
+                    <Button variant="primary" size="sm" onClick={() => votePlan(index, true)}>
+                      Me apunto
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => votePlan(index, false)}>
+                      No puedo
+                    </Button>
+                  </>
+                )}
               </div>
             </Card>
           ))}
@@ -159,7 +192,7 @@ export default function GroupsPage() {
             <Card className="!p-3">
               <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${group.gradient} flex items-center justify-center text-xl`}>
-                  {group.avatar}
+                  {avatarMap[group.avatar] ?? "📌"}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -177,13 +210,22 @@ export default function GroupsPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors">
+                  <button
+                    onClick={() => toast(`Chat de ${group.name} — próximamente`)}
+                    className="p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors"
+                  >
                     <MessageCircle size={16} className="text-[var(--foreground)] opacity-60" />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors">
+                  <button
+                    onClick={() => toast(`Llamando a ${group.name}...`)}
+                    className="p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors"
+                  >
                     <Phone size={16} className="text-[var(--foreground)] opacity-60" />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors">
+                  <button
+                    onClick={() => toast("Más opciones — próximamente")}
+                    className="p-2 rounded-lg hover:bg-[var(--surface-hover)] transition-colors"
+                  >
                     <MoreHorizontal size={16} className="text-[var(--foreground)] opacity-60" />
                   </button>
                 </div>

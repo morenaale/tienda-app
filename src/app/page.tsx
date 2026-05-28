@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -11,9 +13,12 @@ import {
   Users,
   Plus,
   Play,
+  Pause,
+  RotateCcw,
   BookOpen,
   Zap,
 } from "lucide-react";
+import { toast } from "@/components/ui/Toast";
 
 const container = {
   hidden: { opacity: 0 },
@@ -36,21 +41,91 @@ const todayEvents = [
   { time: "19:00", title: "Watch party - película", color: "bg-chambray-dark" },
 ];
 
-const quickActions = [
-  { icon: Plus, label: "Nuevo evento", color: "bg-chambray" },
-  { icon: Users, label: "Crear grupo", color: "bg-terracotta" },
-  { icon: Timer, label: "Focus mode", color: "bg-chambray-dark" },
-  { icon: Calendar, label: "Plan rápido", color: "bg-terracotta-dark" },
-];
-
-const habits = [
+const initialHabits = [
   { name: "Meditar", done: true, streak: 12 },
   { name: "Ejercicio", done: true, streak: 5 },
   { name: "Leer 30 min", done: false, streak: 8 },
   { name: "Journaling", done: false, streak: 3 },
 ];
 
+const POMODORO_DURATION = 25 * 60;
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const [habits, setHabits] = useState(initialHabits);
+
+  const [pomodoroTime, setPomodoroTime] = useState(POMODORO_DURATION);
+  const [pomodoroRunning, setPomodoroRunning] = useState(false);
+  const [pomodoroCount, setPomodoroCount] = useState(3);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setPomodoroRunning(false);
+  }, []);
+
+  useEffect(() => {
+    if (pomodoroRunning && pomodoroTime > 0) {
+      intervalRef.current = setInterval(() => {
+        setPomodoroTime((t) => {
+          if (t <= 1) {
+            stopTimer();
+            setPomodoroCount((c) => c + 1);
+            toast("Pomodoro completado! Descansá 5 min");
+            return POMODORO_DURATION;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [pomodoroRunning, pomodoroTime, stopTimer]);
+
+  const togglePomodoro = () => {
+    if (pomodoroRunning) {
+      stopTimer();
+    } else {
+      setPomodoroRunning(true);
+    }
+  };
+
+  const resetPomodoro = () => {
+    stopTimer();
+    setPomodoroTime(POMODORO_DURATION);
+  };
+
+  const toggleHabit = (index: number) => {
+    setHabits((prev) =>
+      prev.map((h, i) =>
+        i === index
+          ? {
+              ...h,
+              done: !h.done,
+              streak: !h.done ? h.streak + 1 : h.streak - 1,
+            }
+          : h
+      )
+    );
+  };
+
+  const minutes = Math.floor(pomodoroTime / 60);
+  const seconds = pomodoroTime % 60;
+  const progress = pomodoroTime / POMODORO_DURATION;
+
+  const handleQuickAction = (key: string) => {
+    switch (key) {
+      case "event": router.push("/calendar"); break;
+      case "group": router.push("/groups"); break;
+      case "focus": togglePomodoro(); toast("Focus mode activado"); break;
+      case "plan": toast("Proponé un plan a tus amigos"); router.push("/groups"); break;
+    }
+  };
+
   return (
     <motion.div
       variants={container}
@@ -70,9 +145,15 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <motion.div variants={item} className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {quickActions.map((action) => (
+        {([
+          { key: "event", icon: Plus, label: "Nuevo evento", color: "bg-chambray" },
+          { key: "group", icon: Users, label: "Crear grupo", color: "bg-terracotta" },
+          { key: "focus", icon: Timer, label: "Focus mode", color: "bg-chambray-dark" },
+          { key: "plan", icon: Calendar, label: "Plan rápido", color: "bg-terracotta-dark" },
+        ] as const).map((action) => (
           <motion.button
-            key={action.label}
+            key={action.key}
+            onClick={() => handleQuickAction(action.key)}
             className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border-color)] card-shadow hover:card-shadow-hover transition-all"
             whileHover={{ y: -2, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -96,7 +177,7 @@ export default function DashboardPage() {
               <h2 className="font-serif text-lg font-semibold text-[var(--foreground)]">
                 Hoy
               </h2>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => router.push("/calendar")}>
                 Ver todo
               </Button>
             </div>
@@ -104,10 +185,11 @@ export default function DashboardPage() {
               {todayEvents.map((event, i) => (
                 <motion.div
                   key={i}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--surface-hover)] transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
+                  onClick={() => router.push("/calendar")}
                 >
                   <span className="text-xs font-mono text-[var(--foreground)] opacity-50 w-12">
                     {event.time}
@@ -142,25 +224,32 @@ export default function DashboardPage() {
                   fill="none"
                   stroke="var(--primary)"
                   strokeWidth="8"
-                  strokeDasharray={`${2 * Math.PI * 56 * 0.75} ${2 * Math.PI * 56}`}
+                  strokeDasharray={`${2 * Math.PI * 56 * progress} ${2 * Math.PI * 56}`}
                   strokeLinecap="round"
                   className="transition-all duration-1000"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-bold font-mono text-[var(--foreground)]">
-                  18:45
+                  {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
                 </span>
                 <span className="text-xs text-[var(--foreground)] opacity-50">
-                  Focus
+                  {pomodoroRunning ? "Focus" : "Pausado"}
                 </span>
               </div>
             </div>
-            <Button variant="accent" icon={<Play size={16} />}>
-              Iniciar Pomodoro
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="accent"
+                icon={pomodoroRunning ? <Pause size={16} /> : <Play size={16} />}
+                onClick={togglePomodoro}
+              >
+                {pomodoroRunning ? "Pausar" : "Iniciar"}
+              </Button>
+              <Button variant="ghost" icon={<RotateCcw size={16} />} onClick={resetPomodoro} />
+            </div>
             <p className="text-xs text-[var(--foreground)] opacity-50 mt-3">
-              3/4 pomodoros hoy
+              {pomodoroCount}/4 pomodoros hoy
             </p>
           </Card>
         </motion.div>
@@ -175,13 +264,14 @@ export default function DashboardPage() {
               Hábitos
             </h2>
             <div className="space-y-3">
-              {habits.map((habit) => (
+              {habits.map((habit, index) => (
                 <div
                   key={habit.name}
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <motion.button
+                      onClick={() => toggleHabit(index)}
                       className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${
                         habit.done
                           ? "bg-chambray border-chambray"
@@ -204,7 +294,7 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <span className="text-xs text-terracotta font-medium">
-                    {habit.streak} 🔥
+                    {habit.streak} days
                   </span>
                 </div>
               ))}
@@ -251,14 +341,15 @@ export default function DashboardPage() {
             </h2>
             <div className="space-y-3">
               {[
-                { name: "María", status: "Estudiando", emoji: "📚" },
-                { name: "Lucas", status: "Libre", emoji: "☀️" },
-                { name: "Sofía", status: "Trabajando", emoji: "💼" },
-                { name: "Martín", status: "En el gym", emoji: "💪" },
+                { name: "María", status: "Estudiando", emoji: "books" },
+                { name: "Lucas", status: "Libre", emoji: "sun" },
+                { name: "Sofía", status: "Trabajando", emoji: "briefcase" },
+                { name: "Martín", status: "En el gym", emoji: "muscle" },
               ].map((friend) => (
                 <div
                   key={friend.name}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--surface-hover)] transition-colors"
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+                  onClick={() => toast(`${friend.name} — ${friend.status}`)}
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sandstone to-chambray-light flex items-center justify-center">
                     <span className="text-xs font-bold text-clove">
@@ -270,15 +361,20 @@ export default function DashboardPage() {
                       {friend.name}
                     </p>
                     <p className="text-xs text-[var(--foreground)] opacity-50">
-                      {friend.status} {friend.emoji}
+                      {friend.status}
                     </p>
                   </div>
                   <div className="w-2 h-2 rounded-full bg-green-400" />
                 </div>
               ))}
             </div>
-            <Button variant="outline" size="sm" className="w-full mt-3">
-              ¿Quién está libre?
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full mt-3"
+              onClick={() => { toast("Consultando disponibilidad..."); router.push("/groups"); }}
+            >
+              Quién está libre?
             </Button>
           </Card>
         </motion.div>

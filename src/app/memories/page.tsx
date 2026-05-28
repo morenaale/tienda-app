@@ -13,6 +13,7 @@ import {
   Lock,
 } from "lucide-react";
 import { clsx } from "clsx";
+import { toast } from "@/components/ui/Toast";
 
 const container = {
   hidden: { opacity: 0 },
@@ -24,7 +25,7 @@ const item = {
   show: { opacity: 1, scale: 1 },
 };
 
-const memories = [
+const initialMemories = [
   {
     id: 1,
     type: "photo" as const,
@@ -32,6 +33,7 @@ const memories = [
     group: "Amigos de siempre",
     date: "Hace 2 días",
     likes: 8,
+    liked: false,
     comments: 3,
     color: "from-terracotta to-chambray",
     height: "h-64",
@@ -43,6 +45,7 @@ const memories = [
     group: "Study Group",
     date: "Hace 5 días",
     likes: 4,
+    liked: false,
     comments: 1,
     color: "from-chambray to-chambray-dark",
     height: "h-48",
@@ -54,6 +57,7 @@ const memories = [
     group: "Amigos de siempre",
     date: "Se abre en 45 días",
     likes: 0,
+    liked: false,
     comments: 0,
     color: "from-sandstone-dark to-clove",
     height: "h-48",
@@ -65,6 +69,7 @@ const memories = [
     group: "Viaje a Europa 2025",
     date: "Hace 1 semana",
     likes: 12,
+    liked: false,
     comments: 6,
     color: "from-terracotta-light to-terracotta",
     height: "h-72",
@@ -76,6 +81,7 @@ const memories = [
     group: "Facultad",
     date: "Hace 2 semanas",
     likes: 24,
+    liked: false,
     comments: 15,
     color: "from-chambray-light to-terracotta-light",
     height: "h-56",
@@ -87,6 +93,7 @@ const memories = [
     group: "Amigos de siempre",
     date: "Hace 3 semanas",
     likes: 16,
+    liked: false,
     comments: 8,
     color: "from-terracotta to-sandstone-dark",
     height: "h-64",
@@ -102,6 +109,17 @@ type Tab = "all" | "photos" | "capsules";
 
 export default function MemoriesPage() {
   const [activeTab, setActiveTab] = useState<Tab>("all");
+  const [memories, setMemories] = useState(initialMemories);
+
+  const toggleLike = (id: number) => {
+    setMemories((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? { ...m, liked: !m.liked, likes: m.liked ? m.likes - 1 : m.likes + 1 }
+          : m
+      )
+    );
+  };
 
   const filtered = memories.filter((m) => {
     if (activeTab === "photos") return m.type === "photo";
@@ -126,10 +144,10 @@ export default function MemoriesPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" icon={<Lock size={14} />}>
+          <Button variant="outline" size="sm" icon={<Lock size={14} />} onClick={() => toast("Crear cápsula — próximamente")}>
             Cápsula
           </Button>
-          <Button variant="accent" size="sm" icon={<Plus size={14} />}>
+          <Button variant="accent" size="sm" icon={<Plus size={14} />} onClick={() => toast("Subir foto — próximamente")}>
             Subir
           </Button>
         </div>
@@ -143,7 +161,12 @@ export default function MemoriesPage() {
           className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0"
         >
           {throwbacks.map((tb) => (
-            <Card key={tb.title} glass className="min-w-[280px] flex-shrink-0 !p-3">
+            <Card
+              key={tb.title}
+              glass
+              className="min-w-[280px] flex-shrink-0 !p-3 cursor-pointer"
+              onClick={() => toast(`Reviviendo: ${tb.event}`)}
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-terracotta/20 to-chambray/20 flex items-center justify-center">
                   <Sparkles size={18} className="text-terracotta" />
@@ -247,11 +270,22 @@ export default function MemoriesPage() {
                   </div>
                   {memory.type === "photo" && (
                     <div className="flex items-center gap-4 mt-2">
-                      <button className="flex items-center gap-1 text-xs text-[var(--foreground)] opacity-60 hover:opacity-100 hover:text-terracotta transition-colors">
-                        <Heart size={14} />
+                      <button
+                        onClick={() => toggleLike(memory.id)}
+                        className={clsx(
+                          "flex items-center gap-1 text-xs transition-colors",
+                          memory.liked
+                            ? "text-terracotta"
+                            : "text-[var(--foreground)] opacity-60 hover:opacity-100 hover:text-terracotta"
+                        )}
+                      >
+                        <Heart size={14} fill={memory.liked ? "currentColor" : "none"} />
                         <span>{memory.likes}</span>
                       </button>
-                      <button className="flex items-center gap-1 text-xs text-[var(--foreground)] opacity-60 hover:opacity-100 transition-colors">
+                      <button
+                        onClick={() => toast("Comentarios — próximamente")}
+                        className="flex items-center gap-1 text-xs text-[var(--foreground)] opacity-60 hover:opacity-100 transition-colors"
+                      >
                         <MessageCircle size={14} />
                         <span>{memory.comments}</span>
                       </button>

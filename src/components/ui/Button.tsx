@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { clsx } from "clsx";
 
 interface ButtonProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: "primary" | "accent" | "ghost" | "outline";
   size?: "sm" | "md" | "lg";
   className?: string;

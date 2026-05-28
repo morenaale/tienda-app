@@ -12,6 +12,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { clsx } from "clsx";
+import { toast } from "@/components/ui/Toast";
 
 type ViewMode = "day" | "week" | "month";
 
@@ -105,7 +106,7 @@ export default function CalendarPage() {
               </button>
             ))}
           </div>
-          <Button variant="accent" size="sm" icon={<Plus size={16} />}>
+          <Button variant="accent" size="sm" icon={<Plus size={16} />} onClick={() => toast("Crear evento — próximamente")}>
             Evento
           </Button>
         </div>
@@ -210,7 +211,7 @@ export default function CalendarPage() {
                 <p className="text-sm text-[var(--foreground)] opacity-50">
                   No hay eventos este día
                 </p>
-                <Button variant="outline" size="sm" className="mt-3" icon={<Plus size={14} />}>
+                <Button variant="outline" size="sm" className="mt-3" icon={<Plus size={14} />} onClick={() => toast("Crear evento — próximamente")}>
                   Agregar evento
                 </Button>
               </motion.div>
@@ -234,7 +235,7 @@ export default function CalendarPage() {
             { name: "Facultad - Grupo A", members: 12, color: "from-terracotta to-terracotta-dark" },
             { name: "Viaje Bariloche", members: 4, color: "from-chambray-light to-terracotta" },
           ].map((cal) => (
-            <Card key={cal.name} hover>
+            <Card key={cal.name} hover onClick={() => toast(`Abriendo ${cal.name}`)} >
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${cal.color} flex items-center justify-center`}>
                   <span className="text-white text-xs font-bold">

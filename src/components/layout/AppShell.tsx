@@ -2,6 +2,7 @@
 
 import { Sidebar, MobileNav, TopBar } from "./Sidebar";
 import { ThemeProvider } from "./ThemeProvider";
+import { ToastContainer } from "../ui/Toast";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +17,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       <MobileNav />
+      <ToastContainer />
     </ThemeProvider>
   );
 }
